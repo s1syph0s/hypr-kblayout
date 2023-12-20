@@ -42,7 +42,7 @@ fn try_main() -> Result<()> {
             let lang = kbd_conf.layout().split_once(' ').unwrap().0;
 
             let json_msg = JsonMsg {
-                text: lang.to_string(),
+                text: lang,
             };
 
             let j = serde_json::to_string(&json_msg)?;
@@ -61,6 +61,6 @@ fn newline_idx(arr: &[u8]) -> Option<usize> {
 }
 
 #[derive(Serialize, Deserialize)]
-struct JsonMsg {
-    text: String,
+struct JsonMsg<'a> {
+    text: &'a str,
 }
