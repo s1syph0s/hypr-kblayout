@@ -2,6 +2,8 @@ use std::os::unix::net::UnixStream;
 use std::io::prelude::*;
 use std::path::Path;
 use std::{env, process, error};
+use hypr_kblayout::parser::KeyboardConfig;
+use serde::{Deserialize, Serialize};
 
 const HYPR_SOCKET: &str = "HYPRLAND_INSTANCE_SIGNATURE";
 const SOCKET_NAME: &str = ".socket2.sock";
@@ -33,7 +35,18 @@ fn try_main() -> Result<()> {
         if let Some(end) = newline_idx(&buf) {
             let msg = std::str::from_utf8(&buf)?;
             let msg = &msg[..end];
-            println!("msg: {msg}");
+
+            let Some(kbd_conf) = KeyboardConfig::new(msg) else {
+                continue;
+            };
+            let lang = kbd_conf.layout().split_once(' ').unwrap().0;
+
+            let json_msg = JsonMsg {
+                text: lang.to_string(),
+            };
+
+            let j = serde_json::to_string(&json_msg)?;
+            println!("{}", j);
         }
     }
 }
@@ -45,4 +58,9 @@ fn newline_idx(arr: &[u8]) -> Option<usize> {
         }
     }
     None
+}
+
+#[derive(Serialize, Deserialize)]
+struct JsonMsg {
+    text: String,
 }
