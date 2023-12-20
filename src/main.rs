@@ -3,7 +3,6 @@ use hypr_kblayout::args::Args;
 use hypr_kblayout::error::KbError;
 use hypr_kblayout::parser::KeyboardConfig;
 use serde::{Deserialize, Serialize};
-use std::error::Error;
 use std::io::prelude::*;
 use std::os::unix::net::UnixStream;
 use std::path::Path;
