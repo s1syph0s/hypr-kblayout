@@ -5,7 +5,7 @@ pub struct KeyboardConfig<'a> {
 }
 
 impl<'a> KeyboardConfig<'a> {
-    pub fn new(raw_str: &'a str) -> Option<Self> {
+    pub fn new(raw_str: &'a str, target_name: &'a str) -> Option<Self> {
         if !Self::event_valid(raw_str) {
             return None;
         }
@@ -16,6 +16,10 @@ impl<'a> KeyboardConfig<'a> {
         let Some((keyboard_name, layout)) = data.rsplit_once(',') else {
             return None;
         };
+
+        if keyboard_name != target_name {
+            return None;
+        }
 
         Some(Self { keyboard_name, layout })
     }
@@ -73,7 +77,8 @@ mod test {
     #[test]
     fn test_new() {
         let raw_str = "activelayout>>hp,-inc-hyperx-alloy-origins,English (US)";
-        let kbd_conf = KeyboardConfig::new(raw_str);
+        let args = "hp,-inc-hyperx-alloy-origins";
+        let kbd_conf = KeyboardConfig::new(raw_str, args);
         let target_conf = KeyboardConfig { 
             keyboard_name: "hp,-inc-hyperx-alloy-origins",
             layout: "English (US)",
