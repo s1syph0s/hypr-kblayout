@@ -16,7 +16,7 @@ type Result<T> = std::result::Result<T, Box<dyn error::Error>>;
 
 fn main() {
     match try_main() {
-        Ok(()) => return,
+        Ok(()) => (),
         Err(e) => {
             eprintln!("Error: {e}");
             process::exit(1);
@@ -37,7 +37,7 @@ fn try_main() -> Result<()> {
     let mut stream = UnixStream::connect(sock_path)?;
     loop {
         let mut buf: [u8; 1024] = [0; 1024];
-        stream.read(&mut buf)?;
+        let _len = stream.read(&mut buf)?;
         if let Some(end) = newline_idx(&buf) {
             let msg = std::str::from_utf8(&buf)?;
             let msg = &msg[..end];
@@ -55,7 +55,7 @@ fn try_main() -> Result<()> {
     }
 }
 
-fn init_layout<'a>(target_kb: &'a str) -> Result<()> {
+fn init_layout(target_kb: &str) -> Result<()> {
     let hypr_socket = env::var(HYPR_SOCKET).unwrap_or_else(|x| {
         eprintln!("Env variable {} not found: {x}", HYPR_SOCKET);
         process::exit(1);
@@ -66,11 +66,11 @@ fn init_layout<'a>(target_kb: &'a str) -> Result<()> {
     stream.write_all(b"devices")?;
 
     let mut buf: [u8; 8192] = [0; 8192];
-    stream.read(&mut buf)?;
+    let _len = stream.read(&mut buf)?;
     let msg = std::str::from_utf8(&buf)?;
 
     let msg = get_active_layout(msg, target_kb)?;
-    let lang = msg.split_once(" ").unwrap().0;
+    let lang = msg.split_once(' ').unwrap().0;
 
     let json_msg = JsonMsg { text: lang };
 
@@ -79,7 +79,7 @@ fn init_layout<'a>(target_kb: &'a str) -> Result<()> {
     Ok(())
 }
 
-fn get_active_layout<'a, 'b>(msg: &'a str, target_kb: &'b str) -> Result<&'a str> {
+fn get_active_layout<'a>(msg: &'a str, target_kb: &str) -> Result<&'a str> {
     let curr_kmap = &msg[msg.find("Keyboards:").unwrap()..];
 
     let Some(i) = curr_kmap.find(target_kb) else {
@@ -96,7 +96,7 @@ fn get_active_layout<'a, 'b>(msg: &'a str, target_kb: &'b str) -> Result<&'a str
 
 fn newline_idx(arr: &[u8]) -> Option<usize> {
     for (i, b) in arr.iter().enumerate() {
-        if *b == 10 as u8 {
+        if *b == 10u8 {
             return Some(i);
         }
     }
@@ -114,6 +114,6 @@ mod tests {
 
     #[test]
     fn test_init_layout() {
-        init_layout("hp,-inc-hyperx-alloy-origins");
+        let _ = init_layout("hp,-inc-hyperx-alloy-origins");
     }
 }
