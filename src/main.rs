@@ -9,6 +9,7 @@ use std::path::Path;
 use std::{env, error, process};
 
 const HYPR_SOCKET: &str = "HYPRLAND_INSTANCE_SIGNATURE";
+const XDG_RUNTIME_DIR: &str = "XDG_RUNTIME_DIR";
 const SOCKET_NAME: &str = ".socket.sock";
 const SOCKET2_NAME: &str = ".socket2.sock";
 
@@ -30,7 +31,11 @@ fn try_main() -> Result<()> {
         eprintln!("Env variable {} not found: {x}", HYPR_SOCKET);
         process::exit(1);
     });
-    let sock_path = Path::new("/tmp/hypr/").join(hypr_socket).join(SOCKET2_NAME);
+    let xdg_dir = env::var(XDG_RUNTIME_DIR).unwrap_or_else(|x| {
+        eprintln!("Env variable {} not found: {x}", XDG_RUNTIME_DIR);
+        process::exit(1);
+    });
+    let sock_path = Path::new(&xdg_dir).join(hypr_socket).join(SOCKET2_NAME);
 
     init_layout(&args.name)?;
 
@@ -60,7 +65,11 @@ fn init_layout(target_kb: &str) -> Result<()> {
         eprintln!("Env variable {} not found: {x}", HYPR_SOCKET);
         process::exit(1);
     });
-    let sock_path = Path::new("/tmp/hypr/").join(hypr_socket).join(SOCKET_NAME);
+    let xdg_dir = env::var(XDG_RUNTIME_DIR).unwrap_or_else(|x| {
+        eprintln!("Env variable {} not found: {x}", XDG_RUNTIME_DIR);
+        process::exit(1);
+    });
+    let sock_path = Path::new(&xdg_dir).join(hypr_socket).join(SOCKET_NAME);
 
     let mut stream = UnixStream::connect(sock_path)?;
     stream.write_all(b"devices")?;
