@@ -35,7 +35,10 @@ fn try_main() -> Result<()> {
         eprintln!("Env variable {} not found: {x}", XDG_RUNTIME_DIR);
         process::exit(1);
     });
-    let sock_path = Path::new(&xdg_dir).join("hypr").join(hypr_socket).join(SOCKET2_NAME);
+    let sock_path = Path::new(&xdg_dir)
+        .join("hypr")
+        .join(hypr_socket)
+        .join(SOCKET2_NAME);
     println!("{}", sock_path.display());
 
     init_layout(&args.name)?;
@@ -70,7 +73,10 @@ fn init_layout(target_kb: &str) -> Result<()> {
         eprintln!("Env variable {} not found: {x}", XDG_RUNTIME_DIR);
         process::exit(1);
     });
-    let sock_path = Path::new(&xdg_dir).join("hypr").join(hypr_socket).join(SOCKET_NAME);
+    let sock_path = Path::new(&xdg_dir)
+        .join("hypr")
+        .join(hypr_socket)
+        .join(SOCKET_NAME);
 
     let mut stream = UnixStream::connect(sock_path)?;
     stream.write_all(b"devices")?;
