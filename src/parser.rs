@@ -9,13 +9,9 @@ impl<'a> KeyboardConfig<'a> {
         if !Self::event_valid(raw_str) {
             return None;
         }
-        let Some(data) = Self::get_data(raw_str) else {
-            return None;
-        };
-        
-        let Some((keyboard_name, layout)) = data.rsplit_once(',') else {
-            return None;
-        };
+        let data = Self::get_data(raw_str)?;
+
+        let (keyboard_name, layout) = data.rsplit_once(',')?;
 
         if keyboard_name != target_name {
             return None;
