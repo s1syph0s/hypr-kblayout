@@ -17,7 +17,10 @@ impl<'a> KeyboardConfig<'a> {
             return None;
         }
 
-        Some(Self { keyboard_name, layout })
+        Some(Self {
+            keyboard_name,
+            layout,
+        })
     }
 
     fn event_valid(raw_str: &'a str) -> bool {
@@ -33,7 +36,7 @@ impl<'a> KeyboardConfig<'a> {
 
     fn get_data(raw_str: &'a str) -> Option<&'a str> {
         if let Some(i) = raw_str.rfind('>') {
-            let data = &raw_str[i+1..];
+            let data = &raw_str[i + 1..];
             return Some(data);
         }
         None
@@ -75,7 +78,7 @@ mod test {
         let raw_str = "activelayout>>hp,-inc-hyperx-alloy-origins,English (US)";
         let args = "hp,-inc-hyperx-alloy-origins";
         let kbd_conf = KeyboardConfig::new(raw_str, args);
-        let target_conf = KeyboardConfig { 
+        let target_conf = KeyboardConfig {
             keyboard_name: "hp,-inc-hyperx-alloy-origins",
             layout: "English (US)",
         };
